@@ -150,6 +150,7 @@ class ip_geoloc_plugin_style_leaflet extends views_plugin_style {
     $options['map_options'] = array(
       'contains' => array(
         'maxzoom' => array('default' => 18),
+        'minzoom' => array('default' => 0),
         'zoom' => array('default' => 2),
         'zoom_on_click' => array('default' => ''),
         'center_lat' => array('default' => ''),
@@ -898,6 +899,13 @@ class ip_geoloc_plugin_style_leaflet extends views_plugin_style {
       '#collapsed' => TRUE,
       '#weight' => $weight++,
     );
+    $form['map_options']['minzoom'] = array(
+      '#title' => t('Minimum zoom level (0..@zoomtop)', array('@zoomtop' => $zoom_top)),
+      '#type' => 'textfield',
+      '#size' => 2,
+      '#default_value' => $this->options['map_options']['minzoom'],
+      '#description' => t('Note that not all maps support all zoom levels.'),
+    );
     $form['map_options']['maxzoom'] = array(
       '#title' => t('Maximum zoom level (0..@zoomtop)', array('@zoomtop' => $zoom_top)),
       '#type' => 'textfield',
@@ -1001,6 +1009,13 @@ class ip_geoloc_plugin_style_leaflet extends views_plugin_style {
     $zoom_top = 18;
     if (isset($selected_map['settings']['maxZoom'])) {
       $zoom_top = $selected_map['settings']['maxZoom'];
+    }
+    $min_zoom = $style_options['map_options']['minzoom'];
+    if ($min_zoom != '' && (!is_numeric($min_zoom) || $min_zoom < 0 || $min_zoom > $zoom_top)) {
+      form_error($form['map_options']['minzoom'], t('"Minimum zoom level" for %map must be in range 0..@zoomtop', array(
+        '%map' => $selected_map['label'],
+        '@zoomtop' => $zoom_top,
+      )));
     }
     $max_zoom = $style_options['map_options']['maxzoom'];
     if ($max_zoom != '' && (!is_numeric($max_zoom) || $max_zoom < 0 || $max_zoom > $zoom_top)) {
@@ -1111,6 +1126,7 @@ class ip_geoloc_plugin_style_leaflet extends views_plugin_style {
     $tag_css_classes = $this->options['tags']['tag_css_class'];
     $module_path = backdrop_get_path('module', 'ip_geoloc');
     $marker_path = file_create_url(ip_geoloc_marker_directory());
+    $min_zoom = (int) $this->options['map_options']['minzoom'];
     $max_zoom = (int) $this->options['map_options']['maxzoom'];
     $zoom = max(1, (int) $this->options['map_options']['zoom']);
     $zoom_on_click = (int) $this->options['map_options']['zoom_on_click'];
@@ -1411,6 +1427,7 @@ class ip_geoloc_plugin_style_leaflet extends views_plugin_style {
         $map['center']['force'] = TRUE;
       }
     }
+    $map['settings']['minZoom'] = $min_zoom;
     $map['settings']['maxZoom'] = $max_zoom;
     $map['settings']['scrollWheelZoom'] = $scroll_wheel_zoom;
     $map['settings']['dragging'] = $dragging;
