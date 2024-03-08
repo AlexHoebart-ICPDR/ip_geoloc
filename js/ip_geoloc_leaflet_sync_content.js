@@ -5,6 +5,7 @@ L.Sync =  L.Class.extend({
     SYNC_CONTENT_TO_MARKER: 1 << 1,
     SYNC_MARKER_TO_CONTENT: 1 << 2,
     SYNC_MARKER_TO_CONTENT_WITH_POPUP: 1 << 3,
+    SYNC_ON_CLICK: 1 << 5,
 
     SYNCED_CONTENT_HOVER: 'synced-content-hover',
     SYNCED_MARKER_HOVER : 'synced-marker-hover',
@@ -19,6 +20,7 @@ L.Sync =  L.Class.extend({
     L.setOptions(this, options);
     this.map = map;
     this.lastMarker = null;
+    this.lastContent = null;
 	},
 
   closePopup: function(marker) {
@@ -57,16 +59,25 @@ L.Sync =  L.Class.extend({
     this.removeClass(marker, L.Sync.SYNCED_CONTENT_HOVER);
   },
 
-  syncContentToMarker: function(contentSelector, marker) {
-    marker.on('mouseover', function(event) {
+  syncContentToMarker: function(contentSelector, marker, action) {
+    var sync = this;
+    marker.on(action, function(event) {
       jQuery(contentSelector).addClass(L.Sync.SYNCED_MARKER_HOVER);
+      //On click event, unhighlight previous element and smoothen content scrolling
+      if (action == 'click') {
+        jQuery(sync.lastContent).removeClass(L.Sync.SYNCED_MARKER_HOVER);
+        sync.lastContent = contentSelector;
+        jQuery('tr' + contentSelector)[0].scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
+      }
     });
-    marker.on('mouseout', function(event) {
-      jQuery(contentSelector).removeClass(L.Sync.SYNCED_MARKER_HOVER);
-    });
+    if (action == 'mouseover') {
+      marker.on('mouseout', function(event) {
+        jQuery(contentSelector).removeClass(L.Sync.SYNCED_MARKER_HOVER);
+      });
+    }
   },
 
-  syncMarkerToContent: function(contentSelector, marker) {
+  syncMarkerToContent: function(contentSelector, marker, action) {
     var sync = this;
 
     marker.on('popupclose', function(event) {
@@ -82,7 +93,13 @@ L.Sync =  L.Class.extend({
     });
 
     // Using bind() as D7 core's jQuery is old and does not support on()
-    jQuery(contentSelector).bind('mouseover', function(event) {
+    jQuery(contentSelector).bind(action, function(event) {
+      //On click event, need to unhighlight previous element and add hightlight permanently
+      if (action == 'click') {
+        jQuery(sync.lastContent).removeClass(L.Sync.SYNCED_MARKER_HOVER);
+        jQuery(contentSelector).addClass(L.Sync.SYNCED_MARKER_HOVER);
+        sync.lastContent = contentSelector;
+      }
       sync.handleContentMouseOver(marker);
     });
   },
@@ -215,12 +232,12 @@ jQuery(document).bind('leaflet.map', function(event, map, lMap) {
     if (marker.flags) {
       // A CSS class, not an ID as multiple markers may be attached to same node.
       var contentSelector = ".sync-id-" + marker.feature_id;
-
+      var action = (marker.flags & L.Sync.SYNC_ON_CLICK) ? 'click' : 'mouseover';
       if (marker.flags & L.Sync.SYNC_CONTENT_TO_MARKER) {
-        sync.syncContentToMarker(contentSelector, marker);
+        sync.syncContentToMarker(contentSelector, marker, action);
       }
       if (marker.flags & L.Sync.SYNC_MARKER_TO_CONTENT) {
-        sync.syncMarkerToContent(contentSelector, marker);
+        sync.syncMarkerToContent(contentSelector, marker, action);
       }
       marker.on('add', function(event) {
         event.target.addedViaSync = false;

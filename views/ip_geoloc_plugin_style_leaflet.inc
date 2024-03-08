@@ -14,6 +14,7 @@ define('LEAFLET_SYNC_CONTENT_TO_MARKER', 1 << 1);
 define('LEAFLET_SYNC_MARKER_TO_CONTENT', 1 << 2);
 define('LEAFLET_SYNC_MARKER_TO_CONTENT_WITH_POPUP', 1 << 3);
 define('LEAFLET_SYNC_REVERT_LAST_MARKER_ON_MAP_OUT', 1 << 4);
+define('LEAFLET_SYNC_ON_CLICK', 1 << 5);
 
 define('TWEENMAX_VERSION', '2.1.3'); // May 2019
 
@@ -78,6 +79,7 @@ class ip_geoloc_plugin_style_leaflet extends views_plugin_style {
         LEAFLET_SYNC_MARKER_TO_CONTENT => array('default' => FALSE),
         LEAFLET_SYNC_MARKER_TO_CONTENT_WITH_POPUP => array('default' => TRUE),
         LEAFLET_SYNC_REVERT_LAST_MARKER_ON_MAP_OUT => array('default' => TRUE),
+        LEAFLET_SYNC_ON_CLICK => array('default' => FALSE),
       ),
     );
     $options['full_screen'] = array('default' => FALSE);
@@ -543,7 +545,7 @@ class ip_geoloc_plugin_style_leaflet extends views_plugin_style {
         . t('For Views content, you can do this by adding a <strong>Row class</strong> to the Grid, Table, HTML or Unformatted list formats of your Views Attachment or Block displays.'),
       '#type' => 'fieldset',
       '#collapsible' => TRUE,
-      '#collapsed' => empty($this->options['sync'][LEAFLET_SYNC_CONTENT_TO_MARKER]),
+      '#collapsed' => empty($this->options['sync'][LEAFLET_SYNC_CONTENT_TO_MARKER]) && empty($this->options['sync'][LEAFLET_SYNC_MARKER_TO_CONTENT]),
       '#weight' => $weight++,
     );
     $note = t('You can redefine this class to change the default look.');
@@ -577,6 +579,15 @@ class ip_geoloc_plugin_style_leaflet extends views_plugin_style {
       '#title' => t('Unhighlight marker and close its balloon when hovering off the map'),
       '#type' => 'checkbox',
       '#default_value' => $this->options['sync'][LEAFLET_SYNC_REVERT_LAST_MARKER_ON_MAP_OUT],
+      '#states' => array(
+        'visible' => array(':input[name="style_options[sync][4]"]' => array('checked' => TRUE)),
+      ),
+      '#weight' => $weight++,
+    );
+    $form['sync'][LEAFLET_SYNC_ON_CLICK] = array(
+      '#title' => t('Sync on click instead of hover'),
+      '#type' => 'checkbox',
+      '#default_value' => $this->options['sync'][LEAFLET_SYNC_ON_CLICK],
       '#states' => array(
         'visible' => array(':input[name="style_options[sync][4]"]' => array('checked' => TRUE)),
       ),
@@ -1076,6 +1087,9 @@ class ip_geoloc_plugin_style_leaflet extends views_plugin_style {
       }
       if (!empty($this->options['sync'][LEAFLET_SYNC_REVERT_LAST_MARKER_ON_MAP_OUT])) {
         $sync_flags |= LEAFLET_SYNC_REVERT_LAST_MARKER_ON_MAP_OUT;
+      }
+      if (!empty($this->options['sync'][LEAFLET_SYNC_ON_CLICK])) {
+        $sync_flags |= LEAFLET_SYNC_ON_CLICK;
       }
     }
     $has_full_screen = !empty($this->options['full_screen']);
