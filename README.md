@@ -26,6 +26,7 @@ Current Maintainers
 -------------------
 
 - [Laryn Kragt Bakker](https://github.com/laryn) - [CEDC.org](https://cedc.org).
+- [Alex Höbart](https://github.com/AlexHoebart-ICPDR)
 
 Credits
 -------
