@@ -65,7 +65,7 @@ function ip_geoloc_requirements($phase) {
 
   $library = backdrop_get_library('leaflet_markercluster', 'leaflet_markercluster');
   if (isset($library['js'][0]['data'])) {
-    $requirements['ip_geoloc_markercluster']['title'] = t('IP Geolocation Views & Maps; Leaflet MarkerCluster library');
+    $requirements['ip_geoloc_markercluster']['title'] = t('IP Geolocation Views & Maps; Leaflet Markercluster library');
     if (strpos($library['js'][0]['data'], IP_GEOLOC_LEAFLET_MARKERCLUSTER_REGIONBOUND_JS)) {
       $requirements['ip_geoloc_markercluster']['value'] = t('Installed with RegionBound extension');
       $requirements['ip_geoloc_markercluster']['severity'] = REQUIREMENT_OK;
@@ -73,8 +73,8 @@ function ip_geoloc_requirements($phase) {
     else {
       $requirements['ip_geoloc_markercluster']['value'] = t('Using basic version');
       $requirements['ip_geoloc_markercluster']['severity'] = REQUIREMENT_INFO;
-      $requirements['ip_geoloc_markercluster']['description'] = t('Leaflet MarkerCluster installed without region-aware extension. You are not making the most of your clustering. We suggest you obtain the <a href="http://regionbound.com">RegionBound</a> marker cluster .js file and drop it in %directory for superior clustering.', array(
-        '%directory' => leaflet_markercluster_get_library_path(),
+      $requirements['ip_geoloc_markercluster']['description'] = t('Leaflet Markercluster installed without region-aware extension. You are not making the most of your clustering. We suggest you obtain the <a href="http://regionbound.com">RegionBound</a> marker cluster .js file and drop it in %directory for superior clustering.', array(
+        '%directory' => dirname($library['js'][0]['data']),
       ));
     }
   }

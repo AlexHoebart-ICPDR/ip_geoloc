@@ -339,9 +339,9 @@ function ip_geoloc_plugin_style_diff_color_ass_submit($form, &$form_state) {
   $diff_color_ass = config_get('ip_geoloc.settings', 'ip_geoloc_' . $view_id . '_color_mappings');
   unset($diff_color_ass[$display_id][$differentiator]);
 
-  if (!empty($form_state['values']['color_table'])) {
+  if (!empty($form_state['input']['color_table'])) {
     $i = 0;
-    foreach ($form_state['values']['color_table'] as $association) {
+    foreach ($form_state['input']['color_table'] as $association) {
 
       if (is_array($association[$differentiator])) {
         // E.g association['field_address']['und'][0]['postal_code']
@@ -569,7 +569,7 @@ function theme_ip_geoloc_plugin_style_differentiator_color_table($variables) {
   }
   $instances = ip_geoloc_get_field_instances($differentiator);
   $instance = reset($instances);
-  $differentiator_label = isset($instance) ? $instance['label'] : $differentiator;
+  $differentiator_label = isset($instance['label']) ? $instance['label'] : $differentiator;
 
   $headers = array(
     t('%differentiator value', array('%differentiator' => $differentiator_label)),

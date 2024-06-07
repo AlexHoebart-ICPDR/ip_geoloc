@@ -73,33 +73,10 @@ function ip_geoloc_help($path, $arg) {
 }
 
 /**
- * Implements hook_library().
+ * Implements hook_library_info().
  */
-function ip_geoloc_library() {
+function ip_geoloc_library_info() {
   $libraries = array();
-
-  $path_fullscreen = libraries_get_path('leaflet-fullscreen') . '/dist';
-  $libraries['leaflet-fullscreen'] = array(
-    'title' => 'Leaflet Fullscreen',
-    'version' => '0.0.3',
-    'js' => array(
-      array(
-        'type' => 'file',
-        'data' => "$path_fullscreen/Leaflet.fullscreen.min.js",
-        'group' => JS_LIBRARY,
-        'weight' => 2,
-        'preprocess' => FALSE,
-      ),
-    ),
-    'css' => array(
-      "$path_fullscreen/leaflet.fullscreen.css" => array(
-        'type' => 'file',
-        'media' => 'screen',
-        'group' => CSS_DEFAULT,
-        'weight' => 2,
-      ),
-    ),
-  );
 
   $path_minimap = libraries_get_path('leaflet-minimap') . '/dist';
   $libraries['leaflet-minimap'] = array(
@@ -722,7 +699,7 @@ function ip_geoloc_openlayers_marker_layers() {
 function ip_geoloc_form_views_ui_edit_display_form_alter(&$form, &$form_state) {
   // Append our own handler to deal with saving of the differentiator table.
   if (isset($form['options']['style_options']['differentiator'])) {
-    $form['buttons']['submit']['#submit'][] = 'ip_geoloc_plugin_style_diff_color_ass_submit';
+    $form['actions']['submit']['#submit'][] = 'ip_geoloc_plugin_style_diff_color_ass_submit';
   }
 }
 
