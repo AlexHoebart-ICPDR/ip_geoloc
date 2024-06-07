@@ -73,7 +73,7 @@ function ip_geoloc_help($path, $arg) {
 }
 
 /**
- * Implements hook_library().
+ * Implements hook_library_info().
  */
 function ip_geoloc_library_info() {
   $libraries = array();
@@ -171,7 +171,7 @@ function ip_geoloc_menu() {
  */
 function ip_geoloc_config_info() {
   $prefixes['ip_geoloc.settings'] = array(
-    'label' => t('Module name settings'),
+    'label' => t('IP Geolocation Views and Maps Settings'),
     'group' => t('Configuration'),
   );
   return $prefixes;

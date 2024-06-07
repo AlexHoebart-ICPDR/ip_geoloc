@@ -199,7 +199,8 @@ class ip_geoloc_plugin_style_leaflet extends views_plugin_style {
     ip_geoloc_plugin_style_bulk_of_form($this, $weight, $form, $form_state);
     $form['center_option']['#options'][0] = t('Auto-box to fit all markers (include visitor marker if color <strong>not</strong> set to &lt;none&gt;)');
 
-    $lib_markercluster = module_exists('leaflet_markercluster') ? leaflet_markercluster_get_library_path() : FALSE;
+    $library = backdrop_get_library('leaflet_markercluster', 'leaflet_markercluster');
+    $lib_markercluster = isset($library['js'][0]['data']) ? dirname($library['js'][0]['data']) : FALSE;
     $fields = ip_geoloc_get_display_fields($this->display->handler, FALSE, TRUE);
 
     $this->_add_default_marker($form, $weight);
@@ -381,7 +382,7 @@ class ip_geoloc_plugin_style_leaflet extends views_plugin_style {
       '#description' => t('In addition to balloons, which pop up when markers are <em>clicked</em>, you can have tooltips. A tooltip is a short text that appears when you <em>hover</em> over a marker.'),
       '#weight' => $weight++,
     );
-    $note_polygons = t('Applies to markers. If you want tooltips for lines and polygons too, please use this selector in combination with <a href="@url_leaflet_label">Leaflet Label</a>.', array(
+    $note_polygons = t('Applies to markers. If you want tooltips for lines and polygons too, please use this selector in combination with <a href="@url_leaflet_label">Leaflet Label</a> module (not yet ported to Backdrop).', array(
       '@url_leaflet_label' => url('http://drupal.org/project/leaflet_label'),
     )
         );
@@ -534,7 +535,7 @@ class ip_geoloc_plugin_style_leaflet extends views_plugin_style {
     );
     if (!$lib_markercluster) {
       $form['map_cluster_toggle']['#description'] .= '<br/>' .
-          t('<a href="!url_project">Leaflet MarkerCluster</a> must be enabled.', array('!url_project' => url('http://drupal.org/project/leaflet_markercluster')));
+          t('The Leaflet Markercluster module must be enabled.');
     }
   }
 
@@ -676,9 +677,7 @@ class ip_geoloc_plugin_style_leaflet extends views_plugin_style {
 
   private function _add_markercluster(&$form, $lib_markercluster, &$weight) {
     $desc_a = t('A typical cluster radius is 20 to 100 px. When you use a <em>cluster region differentiator</em> (see below), a marker radius of 200 px or more may give superior results. <br/>The visitor marker is excluded from clustering. Enter 0 to disable clustering altogether.');
-    $desc_b = t('Requires the <a target="project" href="!url_project">Leaflet MarkerCluster</a> module.', array(
-      '!url_project' => url('http://drupal.org/project/leaflet_markercluster'),
-    ));
+    $desc_b = t('Requires the Leaflet Markercluster module.');
     $form['cluster_radius'] = array(
       '#title' => t('Marker cluster radius'),
       '#type' => 'textfield',
@@ -735,9 +734,7 @@ class ip_geoloc_plugin_style_leaflet extends views_plugin_style {
       $region_field_names = $this->options['cluster_differentiator']['cluster_differentiator_fields'];
     }
     if (!module_exists('leaflet_markercluster')) {
-      $desc = t('Requires the <a target="project" href="!url_project">Leaflet MarkerCluster</a> module', array(
-        '!url_project' => url('http://drupal.org/project/leaflet_markercluster'),
-      ));
+      $desc = t('Requires the Leaflet Markercluster module');
       $form['cluster_differentiator']['#description'] .= $desc . ' ' . t('and <a href="!url_regionbound">RegionBound</a> JS plugin.', array('!url_regionbound' => url('http://regionbound.com')));
     }
     elseif ($lib_markercluster && (empty($region_field_names) || !reset($region_field_names))) {
@@ -763,7 +760,7 @@ class ip_geoloc_plugin_style_leaflet extends views_plugin_style {
         'speed' => 'fast',
       ),
       '#description' => t('Select a field (or sequence of fields) that reflect for each location marker the region hierarchy it belongs to. Examples are an <a target="backdrop" href="!url_addressfield">AddressField</a>, a hierarchical taxonomy term based on regions, or individual fields for country, state, city, suburb (<em>in that order</em>). Make sure that the region differentiator you wish to use is included as a field in your view, so it appears in the list above. Note that region differentiators do <em>not</em> need to be associated with latitudes or longitudes. They are just name fields.', array(
-        '!url_addressfield' => url('http://drupal.org/project/addressfield'),
+        '!url_addressfield' => url('https://backdropcms.org/project/addressfield'),
       )),
     );
     $level = 0;
@@ -1449,7 +1446,6 @@ class ip_geoloc_plugin_style_leaflet extends views_plugin_style {
           $map['settings']['clusterAggregationFunction'] = $cluster_aggregation_function;
           $map['settings']['clusterAggregateRanges'] = $cluster_aggregate_ranges;
           $map['settings']['clusterAggregatePrecision'] = $cluster_aggregate_precision;
-          backdrop_add_css(leaflet_markercluster_get_library_path() . '/MarkerCluster.Aggregations.css');
         }
         if ($allow_clusters_of_one) {
           $map['settings']['allowClustersOfOne'] = TRUE;
@@ -1458,7 +1454,7 @@ class ip_geoloc_plugin_style_leaflet extends views_plugin_style {
       }
       else {
         $display_name = $this->view->get_human_name() . ' (' . $this->display->display_title . ')';
-        backdrop_set_message(t('Cannot cluster markers in View %display_name, as the module Leaflet MarkerCluster is not enabled.', array('%display_name' => $display_name)), 'warning');
+        backdrop_set_message(t('Cannot cluster markers in View %display_name, as the module Leaflet Markercluster is not enabled.', array('%display_name' => $display_name)), 'warning', false);
       }
     }
 
