@@ -1459,7 +1459,9 @@ class ip_geoloc_plugin_style_leaflet extends views_plugin_style {
     }
     if ($has_full_screen) {
       // The 'leaflet-fullscreen' library is already included in the leaflet module.
-      $map['settings']['fullscreenControl'] = array('position' => 'topright');
+      $map['settings']['fullscreenControl'] = array('position' => 'topleft');
+    } else {
+      $map['settings']['fullscreenControl'] = FALSE;
     }
     if ($has_mini_map) {
       // Load the 'leaflet-minimap' library, containing JS and CSS.

@@ -19,7 +19,7 @@
         lMap.addControl(L.control.clusterToggle(mapSettings.clusterControl));
       }
       if (mapSettings.scaleControl) {
-        lMap.addControl(L.control.scale(mapSettings.scaleControl));
+//set in leaflet        lMap.addControl(L.control.scale(mapSettings.scaleControl));
       }
       if (mapSettings.miniMap) {
         for (var key in lMap._layers) {
