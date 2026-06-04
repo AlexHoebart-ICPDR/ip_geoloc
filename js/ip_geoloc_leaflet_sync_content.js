@@ -65,7 +65,7 @@ L.Sync =  L.Class.extend({
       jQuery(contentSelector).addClass(L.Sync.SYNCED_MARKER_HOVER);
       //On click event, unhighlight previous element and smoothen content scrolling
       if (action == 'click') {
-        jQuery(sync.lastContent).removeClass(L.Sync.SYNCED_MARKER_HOVER);
+        if (sync.lastContent !== contentSelector) jQuery(sync.lastContent).removeClass(L.Sync.SYNCED_MARKER_HOVER);
         sync.lastContent = contentSelector;
         jQuery('tr' + contentSelector)[0].scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
       }
