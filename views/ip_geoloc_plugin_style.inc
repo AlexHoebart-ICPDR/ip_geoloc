@@ -908,6 +908,24 @@ function _ip_geoloc_plugin_style_get_base2($row, $field_name, $delta) {
       return is_string($base) ? $base : $base['#markup'];
     }
   }
+  // Support simple WKT string
+  elseif (is_string($row->{$field_name})) {
+    $start_coord = strpos($row->{$field_name}, '(');
+    $geo_type = strtolower(trim(substr($row->{$field_name}, 0, $start_coord)));
+    if ($geo_type) {
+      // lat/lon elements are expected for points.
+      if ($geo_type == 'point') {
+        $coord = explode(' ', substr($row->{$field_name}, $start_coord+1, -1));
+        if (isset($coord[1])) {
+          $base = array('geo_type' => $geo_type, 'lat' => (float) $coord[1], 'lon' => (float) $coord[0]);
+        }
+      // wkt element is expected for other geometries.
+      } else {
+        $base = array('geo_type' => $geo_type, 'geom' => $row->{$field_name});
+      }
+      return $base;
+    }
+  }
   return NULL;
 }
 
